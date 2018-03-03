@@ -17,6 +17,7 @@ build_tidy_model_lm <- function(data,
 
       form <- formula(glue::glue("{y_var}~{paste(predictors,collapse='+')}"))
 
+
       lm(data = dat,formula = form)
     })) %>%
     mutate(summary = map(model,broom::tidy)) %>% #coefficients and tstats
