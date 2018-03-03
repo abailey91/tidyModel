@@ -26,7 +26,8 @@ build_tidy_model_lm <- function(data,
     mutate(fit_mse = map_dbl(model,mean_squared_error)) %>% # Mean Squared Error
     mutate(auto_DW = map_dbl(model,function(x){durbin_watson(x$residuals)})) %>% #Durbin Watson stat
     mutate(auto_BGTest = map_dbl(model,function(x){breusch_godfrey_lm_test(x, p = 2)})) %>% #2 period breusch godfrey
-    mutate(normal_jarquebera = map_dbl(model,jarque_bera_test)) #%>%  # Residual Jarque Bera
+    mutate(normal_jarquebera = map_dbl(model,jarque_bera_test)) %>%  # Residual Jarque Bera
+    mutate(var_importance = map(model,relative_weights_importance))
     #mutate(resid_skewness = map_dbl(model,function(x){skewness(x$residuals)})) %>% # Residual Skewness
     #mutate(resid_kurtosis = map_dbl(model,function(x){kurtosis(x$residuals)})) # Residual kurtosis
 }
