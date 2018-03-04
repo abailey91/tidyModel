@@ -5,6 +5,5 @@ mean_squared_error <- function(lm_model){
 
   n <- length(fit)
 
-
   sum((actual - fit)^2) / n
 }

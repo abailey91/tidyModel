@@ -1,10 +1,21 @@
-breusch_godfrey_lm_test <- function(lm_model,p){
+breusch_godfrey_lm_test <- function(lm_model = NULL,p = 2, data = NULL, residuals = NULL){
 
+  if(!is.null(lm_model)){
   model_data <- lm_model$model %>%
     as.data.frame()
 
   #get fitted model residuals
   resids <- lm_model$residuals
+
+  }else{
+    model_data <- data
+
+    resids <- residuals
+  }
+
+  #remove scale from variable names if included in data - will be the case if the model has been standardised
+  colnames(model_data)[-1] <- gsub("scale(",replacement = "",x = colnames(model_data)[-1],fixed = T)
+  colnames(model_data)[-1] <- gsub(")",replacement = "",x = colnames(model_data)[-1],fixed = T)
 
   #create p lags of the errors - set NA to 0
   lagged_errors <- map(0:p,function(x){ dplyr::lead(resids,n = x) %>% as.data.frame() %>% rename(!!(glue::glue("resids_{x}")) := `.`)}) %>%
@@ -24,7 +35,3 @@ breusch_godfrey_lm_test <- function(lm_model,p){
   #get the approximate test statistic
   nrow(model_data) * summary(bg_model)$r.squared
 }
-
-
-
-#lmtest <- breusch_godfrey_lm_test(tidy_model$model[[1]],p = 2)

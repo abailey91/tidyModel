@@ -4,7 +4,8 @@ test_data <- read_csv("data/ad_sales.csv") %>%
   drop_na() %>%
   mutate(Year = c(rep(2016,12),rep(2017,12),rep(2018,12))) %>%
   mutate(Date = as.Date(paste0(Month,"-",Year),"%d-%b-%Y")) %>%
-  mutate(Month = factor(lubridate::month(Date,label = T)))
+  mutate(Month = factor(lubridate::month(Date,label = T))) %>%
+  mutate(Trend = 1:nrow(.))
 
 #create binary month vars
 month_vars <- data.frame(model.matrix(~test_data$Month+0))
@@ -38,11 +39,14 @@ model_pred_vars <- colnames(test_data_final)[!colnames(test_data_final) %in% c("
 
 
 #test output
-undebug(breusch_godfrey_lm_test)
+debug(relative_weights_importance)
 tidy_model <- build_tidy_model_lm(data = test_data_final,
                                   y_var = "Sales",
                                   predictors = model_pred_vars,
+                                  standardise = FALSE,
                                   store)
+
+tidy_model[1,] %>% unnest(summary)
 
 model_coefs <- tidy_model %>%
   unnest(summary) %>%
